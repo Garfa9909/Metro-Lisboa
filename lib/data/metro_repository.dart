@@ -1,25 +1,52 @@
 import 'package:cmproject/models/incident_report.dart';
 import 'package:cmproject/models/station.dart';
 
-class MetroRepository {
+import '../models/Line.dart';
 
-  List<Station> getAllStations() {
-    throw UnimplementedError("getAllStations");
+class MetroRepository
+{
+  List<Station> stations = [Station("or", "Oriente", 38.76772137189328, -9.09880630030998, Line.red, null),
+    Station("cais", "Cais do Sodré", 38.706536481524, -9.14345375711721, Line.green, null),
+    Station("cg", "Campo Grande", 38.7603439284084, -9.157692828750722, Line.green, Line.yellow),];
+
+  Station? getStationDetail(String id)
+  {
+    Station? res;
+
+    for(Station station in stations)
+    {
+      if(station.id == id)  res = station;
+    }
+
+    return res;
   }
 
-  void attachIncident(String id, IncidentReport report)  {
-    throw UnimplementedError("attachIncident");
+  List<Station> getAllStations()
+  {
+    return stations;
   }
 
-  void insertStation(Station station)  {
-    throw UnimplementedError("insertStation");
+  void attachIncident(String id, IncidentReport report)
+  {
+    getStationDetail(id)?.attachIncicent(report);
   }
 
-  Station getStationDetail(String id) {
-    throw UnimplementedError("getStationDetail");
+  void insertStation(Station station)
+  {
+    stations.add(station);
   }
 
-  List<Station> getStationsByName(String name)  {
-    throw UnimplementedError("getStationsByName");
+  List<Station> getStationsByName(String name)
+  {
+    List<Station> res = List.empty(growable: true);
+    for(Station station in stations)
+    {
+      if(station.name == name)
+      {
+        res.add(station);
+      }
+    }
+
+    return res;
   }
 }
