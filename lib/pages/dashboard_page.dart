@@ -9,7 +9,10 @@ class DashboardPage extends StatelessWidget
   Widget build(BuildContext context) {
     return Scaffold(
         key: ValueKey("dashboard-screen"),
-        appBar: AppBar(title:Text(pages[0].title)),
+        appBar: AppBar(title: Text(pages[0].title),
+            titleTextStyle: TextStyle(fontSize: 30, color: Colors.white),
+            backgroundColor: Colors.black,
+            toolbarHeight: 70),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

@@ -1,15 +1,15 @@
 import 'package:cmproject/models/incident_report.dart';
 import 'package:cmproject/models/station.dart';
 
-import '../models/Line.dart';
+import '../pages/Line.dart';
 
 class MetroRepository
 {
-  List<Station> stations = [Station("or", "Oriente", 38.76772137189328, -9.09880630030998, Line.red, null),
-    Station("cais", "Cais do Sodré", 38.706536481524, -9.14345375711721, Line.green, null),
-    Station("cg", "Campo Grande", 38.7603439284084, -9.157692828750722, Line.green, Line.yellow),];
+  List<Station> stations = [Station("or", "Oriente", 38.76772137189328, -9.09880630030998, "Red",),
+    Station("cais", "Cais do Sodré", 38.706536481524, -9.14345375711721, "Green"),
+    Station("cg", "Campo Grande", 38.7603439284084, -9.157692828750722, "Yellow"),];
 
-  Station? getStationDetail(String id)
+  Station? getStationDetail(String? id)
   {
     Station? res;
 
@@ -28,7 +28,7 @@ class MetroRepository
 
   void attachIncident(String id, IncidentReport report)
   {
-    getStationDetail(id)?.attachIncicent(report);
+    getStationDetail(id)?.attachIncident(report);
   }
 
   void insertStation(Station station)

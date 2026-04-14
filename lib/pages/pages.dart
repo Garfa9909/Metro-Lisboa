@@ -5,8 +5,8 @@ import 'list_page.dart';
 import 'map_page.dart';
 
 final pages = [
-  (title: 'Dashboard', icon:Icons.list, widget:DashboardPage(), key: "dashboard"),
-  (title: 'List', icon:Icons.thumb_up, widget:ListPage(), key: "list"),
-  (title: 'Map', icon:Icons.thumb_up, widget:MapPage(), key: "map"),
-  (title: 'Incidents Report', icon:Icons.thumb_up, widget:ReportPage(), key: "incidents-report"),
+  (title: 'Dashboard', icon:Icons.dashboard, widget:DashboardPage(), key: "dashboard"),
+  (title: 'Stations', icon:Icons.list, widget:ListPage(), key: "list"),
+  (title: 'Map', icon:Icons.map, widget:MapPage(), key: "map"),
+  (title: 'Incidents Report', icon:Icons.warning, widget:ReportPage(), key: "incidents-report"),
 ];

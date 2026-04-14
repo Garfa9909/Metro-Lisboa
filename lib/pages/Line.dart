@@ -21,4 +21,17 @@ enum Line
   final String start; //Station where it starts
   final String end; //Station where it ends
 
+  static Line? getByName(String name)
+  {
+    Line? res;
+    for(Line line in values)
+      {
+        if(line.name == name)
+          {
+            res = line;
+          }
+      }
+    return res;
+  }
+
 }
