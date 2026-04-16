@@ -3,6 +3,7 @@ import 'package:cmproject/models/incident_report.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/station.dart';
@@ -97,7 +98,6 @@ class _MainPageState extends State<DetailsPage> {
   {
     return ListTile(
       title:Container(
-        height: 100,
         decoration: BoxDecoration(
             color: Colors.black,
             border: Border.all(color: Colors.white, width: 5),
@@ -109,10 +109,27 @@ class _MainPageState extends State<DetailsPage> {
           padding: const EdgeInsets.all(8),
           child: Column(
             children: [
-              Text("${incident.timestamp.day}/${incident.timestamp.month}/${incident.timestamp.year} - ${incident.timestamp.hour}:${incident.timestamp.minute} - ${incident.type.displayName}",
-              style: TextStyle(color: Colors.white,),),
+              Row(
+              children: [
+                Text(DateFormat("dd/MM/yyyy HH:mm").format(incident.timestamp), style: TextStyle(color: Colors.white,),),
+                SizedBox(width:20),
+                Text(incident.type.displayName, style: TextStyle(color: Colors.white,),),
+            ],
+          ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text("${incident.rate}/5", style: TextStyle(color: Colors.white)),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  ConstrainedBox(constraints: BoxConstraints(maxWidth:300),child: Text(showNotes(incident.notes), style: TextStyle(color: Colors.white,),)),
+                ],
+              ),
 
-              Text("${incident.rate}/5 - ${showNotes(incident.notes)}", style: TextStyle(color: Colors.white,))
+
           ],
           ),
         ),

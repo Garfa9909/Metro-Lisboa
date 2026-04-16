@@ -16,7 +16,18 @@ class MapPage extends StatelessWidget
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Map")
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 400,
+                  width: 400,
+                  child: Image.asset(
+                      "assets/images/mapa.png"
+                  ),
+                ),
+              ],
+            )
           ],
         )
     );

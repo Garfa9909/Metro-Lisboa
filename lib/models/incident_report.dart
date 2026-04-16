@@ -1,10 +1,10 @@
 enum IncidentType
 {
-  escalator('Escalator'),
-  elevator('Elevator'),
-  ticketMachine('Ticket Machine'),
-  turnstile('Turnstile'),
-  other('Other');
+  Escalator('Escalator'),
+  Elevator('Elevator'),
+  TicketMachine('Ticket Machine'),
+  Turnstile('Turnstile'),
+  Other('Other');
 
   final String displayName;
 
@@ -19,6 +19,10 @@ class IncidentReport
   final String? notes;
   final IncidentType type;
 
-  IncidentReport(this.timestamp, this.rate, this.type, this.notes);
+  IncidentReport({
+    required this.timestamp,
+    required this.rate,
+    required this.type,
+    this.notes});
 
 }

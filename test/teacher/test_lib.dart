@@ -1,4 +1,4 @@
-/*import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 const bool skipCheckDependsOn = bool.fromEnvironment(
   'SKIP_DEPENDS_ON',
@@ -41,4 +41,4 @@ class TestDependencyRegistry {
         .where((test) => _results[test] == true)
         .length == tests.length;
   }
-}*/
+}

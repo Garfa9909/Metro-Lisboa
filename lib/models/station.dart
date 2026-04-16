@@ -9,9 +9,18 @@ class Station
   final String name;
   final double latitude, longitude;
   final String lineName;
-  final List<IncidentReport> reports = List.empty(growable: true);
+  final List<IncidentReport> reports;
 
-  Station(this.id, this.name, this.latitude, this.longitude, this.lineName);
+  Station({
+    required this.id,
+    required this.name,
+    required this.latitude,
+    required this.longitude,
+    required this.lineName,
+    reports,
+  }) : reports = reports ?? List.empty(growable: true);
+
+
 
   void attachIncident(IncidentReport incident)
   {

@@ -1,4 +1,4 @@
-/*import 'package:cmproject/main.dart';
+import 'package:cmproject/main.dart';
 import 'package:cmproject/models/incident_report.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -525,4 +525,3 @@ Future<void> _pumpApp(WidgetTester tester, { List<Station>? testStations }) asyn
 
   await tester.pumpAndSettle(Duration(milliseconds: 200));
 }
-*/

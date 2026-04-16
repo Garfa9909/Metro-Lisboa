@@ -7,13 +7,13 @@ void main()
 {
   MetroRepository repository = MetroRepository();
   runApp(Provider<MetroRepository>(
-      create: (context){ return repository; }, child: const CharcaMetro())
+      create: (context){ return repository; }, child: const MyApp())
   );
 }
 
-class CharcaMetro extends StatelessWidget
+class MyApp extends StatelessWidget
 {
-  const CharcaMetro({super.key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

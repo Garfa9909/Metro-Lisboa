@@ -5,9 +5,9 @@ import '../pages/Line.dart';
 
 class MetroRepository
 {
-  List<Station> stations = [Station("or", "Oriente", 38.76772137189328, -9.09880630030998, "Red",),
-    Station("cais", "Cais do Sodré", 38.706536481524, -9.14345375711721, "Green"),
-    Station("cg", "Campo Grande", 38.7603439284084, -9.157692828750722, "Yellow"),];
+  List<Station> stations = [Station(id: "or", name: "Oriente", latitude:38.76772137189328, longitude:-9.09880630030998, lineName:"Red",),
+    Station(id:"cais", name:"Cais do Sodré", latitude:38.706536481524, longitude:-9.14345375711721, lineName:"Green"),
+    Station(id:"cg", name:"Campo Grande", latitude:38.7603439284084, longitude:-9.157692828750722, lineName:"Yellow"),];
 
   Station? getStationDetail(String? id)
   {

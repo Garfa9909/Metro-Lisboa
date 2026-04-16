@@ -16,7 +16,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context)
   {
     return Scaffold(
-      body:pages[_selectedIndex].widget,
+      body:pages[_selectedIndex].builder(onChangeTab),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) => setState(()=> _selectedIndex = index
@@ -28,5 +28,13 @@ class _MainPageState extends State<MainPage> {
         )).toList()
       ),
     );
+  }
+
+  void onChangeTab(int index) //Callback for changing tab from other pages
+  {
+    setState(()
+    {
+      _selectedIndex = index;
+    });
   }
 }

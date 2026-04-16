@@ -18,11 +18,11 @@ class _ReportPageState extends State<ReportPage>
 {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  String? _stationName;
-  IncidentType? _incidentType;
-  int? _rating;
-  DateTime? _dateTime;
-  String? _notes;
+  late Station _station;
+  late IncidentType _incidentType;
+  late int _rating;
+  late DateTime _dateTime;
+  String  _notes = "";
 
 
   @override
@@ -42,7 +42,7 @@ class _ReportPageState extends State<ReportPage>
                 key:_formKey,
                 child: Column(
                   children: [
-                    buildStationSelect(repository.getAllStations().map((station) => station.name).toList()),
+                    buildStationSelect(repository.getAllStations().toList()),
                     SizedBox(height: 20,),
                     buildIncidentTypeSelect(IncidentType.values),
                     SizedBox(height: 20,),
@@ -55,7 +55,7 @@ class _ReportPageState extends State<ReportPage>
 
                     ElevatedButton(
                         key: ValueKey("incident-form-submit-button"),
-                        onPressed: () => {submitForm(repository)},
+                        onPressed: () => {submitForm()},
                         child: Text("Submit"))
 
                   ],
@@ -67,14 +67,14 @@ class _ReportPageState extends State<ReportPage>
     );
   }
 
-  FormField<String?> buildStationSelect(List<String> options)
+  FormField<Station> buildStationSelect(List<Station> options)
   {
-    return TestableFormField<String?>(
+    return TestableFormField<Station>(
       key:ValueKey("incident-station-selection-field"),
-      getValue: () => _stationName,
+      getValue: () => _station,
       internalSetValue: (state, value)
       {
-        _stationName = value;
+        _station = value;
         state.didChange(value);
       },
       validator: (value){
@@ -86,7 +86,7 @@ class _ReportPageState extends State<ReportPage>
       },
       onSaved: (value)
       {
-        _stationName = value!;
+        _station = value!;
       },
 
       builder: (field)
@@ -94,7 +94,7 @@ class _ReportPageState extends State<ReportPage>
         return DropdownButtonFormField(
             items: options.map((option) => DropdownMenuItem(
               value: option,
-              child: Text(option),
+              child: Text(option.name),
             )).toList(),
             decoration: InputDecoration(
               labelText: "Station",
@@ -108,9 +108,9 @@ class _ReportPageState extends State<ReportPage>
     );
   }
 
-  FormField<IncidentType?> buildIncidentTypeSelect(List<IncidentType> options)
+  FormField<IncidentType> buildIncidentTypeSelect(List<IncidentType> options)
   {
-    return TestableFormField<IncidentType?>(
+    return TestableFormField<IncidentType>(
       key:ValueKey("incident-type-selection-field"),
       getValue: () => _incidentType,
       internalSetValue: (state, value)
@@ -121,7 +121,7 @@ class _ReportPageState extends State<ReportPage>
       validator: (value){
         if(value == null)
         {
-          return "Preecha o tipo de incidente";
+          return "Preencha o tipo de incidente";
         }
         return null;
       },
@@ -149,9 +149,9 @@ class _ReportPageState extends State<ReportPage>
     );
   }
 
-  FormField<int?> buildRatingSelect()
+  FormField<int> buildRatingSelect()
   {
-    return TestableFormField<int?>(
+    return TestableFormField<int>(
       key:ValueKey("incident-rating-field"),
       getValue: () => _rating,
       internalSetValue: (state, value)
@@ -191,9 +191,9 @@ class _ReportPageState extends State<ReportPage>
     );
   }
 
-  FormField<DateTime?> buildDateTimeSelect()
+  FormField<DateTime> buildDateTimeSelect()
   {
-    return TestableFormField<DateTime?>(
+    return TestableFormField<DateTime>(
       key:ValueKey("incident-datetime-field"),
       getValue: () => _dateTime,
       internalSetValue: (state, value)
@@ -229,9 +229,9 @@ class _ReportPageState extends State<ReportPage>
     );
   }
 
-  FormField<String?> buildNotesField()
+  FormField<String> buildNotesField()
   {
-    return TestableFormField<String?>(
+    return TestableFormField<String>(
       key:ValueKey("incident-notes-field"),
       getValue: () => _notes,
       internalSetValue: (state, value)
@@ -241,7 +241,14 @@ class _ReportPageState extends State<ReportPage>
       },
       onSaved: (value)
       {
-        _notes = value;
+        if(value != null)
+          {
+            _notes = value;
+          }
+          else
+          {
+            _notes = "";
+          }
       },
 
       builder: (field)
@@ -259,13 +266,13 @@ class _ReportPageState extends State<ReportPage>
     );
   }
   
-  void submitForm(MetroRepository repository)
+  void submitForm()
   {
     if (_formKey.currentState!.validate())
     {
       _formKey.currentState!.save();
-      IncidentReport report = IncidentReport(_dateTime!, _rating!, _incidentType!, _notes);
-      Station station = repository.getStationsByName(_stationName!).first;
+      IncidentReport report = IncidentReport(timestamp:_dateTime, rate:_rating, type:_incidentType,notes: _notes);
+      Station station = _station;
       station.attachIncident(report);
       _formKey.currentState?.reset();
     }
