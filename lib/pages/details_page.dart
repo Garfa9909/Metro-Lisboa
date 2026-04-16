@@ -76,7 +76,7 @@ class _MainPageState extends State<DetailsPage> {
             Text("Incidents:", style: TextStyle(color: Colors.black, fontSize: 30)),
             SingleChildScrollView(
               child: SizedBox(
-                height: 220,
+                height: MediaQuery.sizeOf(context).height*0.3,
                 child: ListView(
                   shrinkWrap: true,
                   key:ValueKey("detail-screen-incidents-list"),
