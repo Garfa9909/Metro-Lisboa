@@ -1,7 +1,5 @@
-import 'package:cmproject/pages/map_page.dart';
 import 'package:flutter/material.dart';
 import '/pages/pages.dart';
-import 'list_page.dart';
 
 class DashboardPage extends StatelessWidget
 {

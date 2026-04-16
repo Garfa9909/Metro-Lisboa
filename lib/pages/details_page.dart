@@ -1,13 +1,11 @@
 import 'package:cmproject/data/metro_repository.dart';
 import 'package:cmproject/models/incident_report.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/station.dart';
-import 'Line.dart';
+import 'line.dart';
 
 class DetailsPage extends StatefulWidget
 {
