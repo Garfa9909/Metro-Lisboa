@@ -3,27 +3,27 @@
 Rafael Ceres Martínez - a22510504
 
 # Screenshots
-##Dashboard
+## Dashboard
 
 ![Dashboard](assets/screenshots/dashboard.png)
 
-##List
+## List
 
-![List](assets/screenshots/list.png)
+![List](assets/screenshots/stations.png)
 
-##Details
+## Details
 
 ![Details](assets/screenshots/details.png)
 
-##Map
+## Map
 
 ![Map](assets/screenshots/map.png)
 
-##Report Incident
+## Report Incident
 
 ![Report Incident](assets/screenshots/report.png)
 
-#Functionalities implemented
+# Functionalities implemented
 
 - Passed teacher tests
 
@@ -39,6 +39,6 @@ Rafael Ceres Martínez - a22510504
 
 - Incident report form works as intended
 
-#Auto evaluation
+# Auto evaluation
 
 While I think I implemented all of the functionalities successfully, I could have been more creative on the dashboard. That's why I expect a grade around 14.

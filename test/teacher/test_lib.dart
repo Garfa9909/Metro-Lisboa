@@ -1,23 +1,23 @@
 import 'package:flutter_test/flutter_test.dart';
 
 const bool skipCheckDependsOn = bool.fromEnvironment(
-  'SKIP_DEPENDS_ON',
-  defaultValue: false
+    'SKIP_DEPENDS_ON',
+    defaultValue: false
 );
 
 WidgetTesterCallback checkDependsOn(
-  WidgetTesterCallback body, {
-  bool skipCheckDependsOn = skipCheckDependsOn,
-  List<String> dependsOn = const []
-}) {
+    WidgetTesterCallback body, {
+      bool skipCheckDependsOn = skipCheckDependsOn,
+      List<String> dependsOn = const []
+    }) {
   return (widgetTester) async {
     final testName = widgetTester.testDescription;
     if (!skipCheckDependsOn) {
       if (!TestDependencyRegistry.didPass(dependsOn)) {
         fail(
-          "❗O teste '$testName' depende do(s) teste(s):\n"
-          "${dependsOn.map((test) => test).join('\n')}\n"
-          "para passar, por isso este teste irá falhar automaticamente"
+            "❗O teste '$testName' depende do(s) teste(s):\n"
+                "${dependsOn.map((test) => test).join('\n')}\n"
+                "para passar, por isso este teste irá falhar automaticamente"
         );
       }
     }
