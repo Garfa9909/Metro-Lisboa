@@ -19,7 +19,7 @@ class DashboardPage extends StatelessWidget
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              height: 150,
+              height: MediaQuery.sizeOf(context).height*0.2,
               decoration: BoxDecoration(
                   color: Color(0xffff5050)),
               child: 
@@ -37,15 +37,15 @@ class DashboardPage extends StatelessWidget
               ),
             ),
 
-            buildButton("Check Stations", 1, Icons.list, "dashboard-stations-button"),
+            buildButton("Check Stations", 1, Icons.list, "dashboard-stations-button", context),
             SizedBox(height:30),
-            buildButton("See stations in map", 2, Icons.map, "dashboard-map-button")
+            buildButton("See stations in map", 2, Icons.map, "dashboard-map-button", context)
           ],
         )
     );
   }
 
-  Widget buildButton(String text, int destination, IconData icon, String key)
+  Widget buildButton(String text, int destination, IconData icon, String key, BuildContext context)
   {
     return TextButton(
       key: ValueKey(key),
@@ -57,11 +57,11 @@ class DashboardPage extends StatelessWidget
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: SizedBox(
-            width: 250,
+            width: MediaQuery.sizeOf(context).width*0.7,
             child: Row(
               children: [
                 Icon(icon, color: Colors.white, size: 35,),
-                SizedBox(width:30),
+                SizedBox(width:10),
                 Text(text, style: TextStyle(color:Colors.white, fontSize: 20),),
               ],
             ),
