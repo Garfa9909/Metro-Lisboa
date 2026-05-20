@@ -1,48 +1,41 @@
+import 'package:cmproject/data/sqflite_metro_datasource.dart';
 import 'package:cmproject/models/incident_report.dart';
 import 'package:cmproject/models/station.dart';
 
+import 'http_metro_datasource.dart';
+
 class MetroRepository
 {
-  List<Station> stations = List.empty(growable: true);
 
-  Station? getStationDetail(String? id)
+  final HttpMetroDataSource httpSource;
+  final SqfliteMetroDataSource sqfliteSource;
+
+  MetroRepository({required this.httpSource, required this.sqfliteSource,});
+
+  Future<List<Station>> getAllStations() async
   {
-    Station? res;
 
-    for(Station station in stations)
+    //try //Online
+    //{
+
+
+      final stations = await httpSource.getAllStations();
+
+
+      //await sqliteSource.saveStations(stations);
+
+      return stations;
+
+    //}
+    /*catch (e)  //Offline
     {
-      if(station.id == id)  res = station;
-    }
 
-    return res;
+      //return await sqfliteSource.getAllStations();
+    }*/
   }
 
-  List<Station> getAllStations()
+  Future<Station> getStationDetail(String id) async
   {
-    return stations;
-  }
-
-  void attachIncident(String id, IncidentReport report)
-  {
-    getStationDetail(id)?.attachIncident(report);
-  }
-
-  void insertStation(Station station)
-  {
-    stations.add(station);
-  }
-
-  List<Station> getStationsByName(String name)
-  {
-    List<Station> res = List.empty(growable: true);
-    for(Station station in stations)
-    {
-      if(station.name == name)
-      {
-        res.add(station);
-      }
-    }
-
-    return res;
+    throw UnimplementedError();
   }
 }

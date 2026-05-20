@@ -29,41 +29,84 @@ class _ReportPageState extends State<ReportPage>
   Widget build(BuildContext context)
   {
     MetroRepository repository = context.read<MetroRepository>();
+
     return Scaffold(
-        key: ValueKey("incidents-report-screen"),
-        appBar: AppBar(title: Text(pages[3].title),
-            titleTextStyle: TextStyle(fontSize: 30, color: Colors.white),
-            backgroundColor: Colors.black,
-            toolbarHeight: 70),
-        body: SingleChildScrollView(
-          child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Form(
-                key:_formKey,
-                child: Column(
-                  children: [
-                    buildStationSelect(repository.getAllStations().toList()),
-                    SizedBox(height: 20,),
-                    buildIncidentTypeSelect(IncidentType.values),
-                    SizedBox(height: 20,),
-                    buildRatingSelect(),
-                    SizedBox(height: 20,),
-                    buildDateTimeSelect(),
-                    SizedBox(height: 20,),
-                    buildNotesField(),
-                    SizedBox(height: 20,),
+      key: ValueKey("incidents-report-screen"),
+      appBar: AppBar(
+        title: Text(pages[3].title),
+        titleTextStyle: TextStyle(fontSize: 30, color: Colors.white),
+        backgroundColor: Colors.black,
+        toolbarHeight: 70,
+      ),
+      body: FutureBuilder(
+        future: repository.getAllStations(),
+        builder: (_, snapshot)
+        {
+          if(snapshot.connectionState != ConnectionState.done)
+          {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
 
-                    ElevatedButton(
-                        key: ValueKey("incident-form-submit-button"),
-                        onPressed: () => {submitForm()},
-                        child: Text("Submit"))
+          else
+          {
+            if(snapshot.hasError)
+            {
+              return Center(
+                child: Text("Error"),
+              );
+            }
 
-                  ],
-                ),
+            else
+            {
+              return buildForm(snapshot.data!);
+            }
+          }
+        },
+      ),
+    );
+  }
 
-              )
+  Widget buildForm(List<Station> stations)
+  {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+
+              buildStationSelect(stations),
+
+              SizedBox(height: 20),
+
+              buildIncidentTypeSelect(IncidentType.values),
+
+              SizedBox(height: 20),
+
+              buildRatingSelect(),
+
+              SizedBox(height: 20),
+
+              buildDateTimeSelect(),
+
+              SizedBox(height: 20),
+
+              buildNotesField(),
+
+              SizedBox(height: 20),
+
+              ElevatedButton(
+                key: ValueKey("incident-form-submit-button"),
+                onPressed: () => submitForm(),
+                child: Text("Submit"),
+              ),
+            ],
           ),
-        )
+        ),
+      ),
     );
   }
 

@@ -25,9 +25,10 @@ class _MainPageState extends State<DetailsPage> {
   Widget build(BuildContext context)
   {
     MetroRepository repository = context.read<MetroRepository>();
-    Station? station = repository.getStationDetail(widget.stationId);
-    Line? line = Line.getByName(station!.lineName);
-    return Scaffold(
+    //Station? station = repository.getStationDetail(widget.stationId);
+    //Line? line = Line.getByName(station!.lineName);
+    return Placeholder();
+    /*return Scaffold(
       key: ValueKey("detail-screen"),
       backgroundColor: line?.color,
       appBar: AppBar(title:Text(station.name),
@@ -89,7 +90,7 @@ class _MainPageState extends State<DetailsPage> {
           ],
         ),
       ),
-    );
+    );*/
   }
 
   Widget buildIncidentEntry(IncidentReport incident)
