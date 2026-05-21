@@ -60,7 +60,7 @@ class _ReportPageState extends State<ReportPage>
 
             else
             {
-              return buildForm(snapshot.data!);
+              return buildForm(snapshot.data!, repository.attachIncident);
             }
           }
         },
@@ -68,7 +68,7 @@ class _ReportPageState extends State<ReportPage>
     );
   }
 
-  Widget buildForm(List<Station> stations)
+  Widget buildForm(List<Station> stations, Function submit)
   {
     return SingleChildScrollView(
       child: Padding(
@@ -100,7 +100,7 @@ class _ReportPageState extends State<ReportPage>
 
               ElevatedButton(
                 key: ValueKey("incident-form-submit-button"),
-                onPressed: () => submitForm(),
+                onPressed: () => submitForm(submit),
                 child: Text("Submit"),
               ),
             ],
@@ -137,7 +137,7 @@ class _ReportPageState extends State<ReportPage>
         return DropdownButtonFormField(
             items: options.map((option) => DropdownMenuItem(
               value: option,
-              child: Text(option.name),
+              child: Text("${option.name} - ${option.lineName}"),
             )).toList(),
             decoration: InputDecoration(
               labelText: "Station",
@@ -309,14 +309,14 @@ class _ReportPageState extends State<ReportPage>
     );
   }
   
-  void submitForm()
+  void submitForm(Function submit)
   {
     if (_formKey.currentState!.validate())
     {
       _formKey.currentState!.save();
       IncidentReport report = IncidentReport(timestamp:_dateTime, rate:_rating, type:_incidentType,notes: _notes);
       Station station = _station;
-      station.attachIncident(report);
+      submit(station.id, report); //Calls repository.attachIncident
       _formKey.currentState?.reset();
     }
   }

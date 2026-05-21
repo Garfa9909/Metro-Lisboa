@@ -7,7 +7,7 @@ class Station
   final String name;
   final double latitude, longitude;
   final String lineName;
-  final List<IncidentReport> reports;
+  List<IncidentReport> reports;
 
   factory Station.fromMap(Map<String, dynamic> map, String line)
   {
@@ -21,6 +21,30 @@ class Station
     );
   }
 
+  factory Station.fromDB(Map<String, dynamic> map)
+  {
+    return Station(
+      id: map["id"],
+      name: map["name"],
+      latitude: map["latitude"],
+      longitude: map["longitude"],
+      lineName: map["lineName"],
+
+    );
+  }
+
+  Map<String, dynamic> toDB()
+  {
+    return {
+
+      'id': id,
+      'name': name,
+      'latitude': latitude,
+      'longitude': longitude,
+      'lineName': lineName,
+    };
+  }
+
   Station({
     required this.id,
     required this.name,
@@ -30,10 +54,9 @@ class Station
     reports,
   }) : reports = reports ?? List.empty(growable: true);
 
-
-
-  void attachIncident(IncidentReport incident)
+  void setReports(List<IncidentReport> reports)
   {
-    reports.add(incident);
+    this.reports = reports;
   }
+
 }

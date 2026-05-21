@@ -1,4 +1,8 @@
+import 'package:cmproject/data/http_metro_datasource.dart';
+import 'package:cmproject/data/sqflite_metro_datasource.dart';
+import 'package:cmproject/http/http_client.dart';
 import 'package:cmproject/main.dart';
+import 'package:cmproject/services/connectivity_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cmproject/data/metro_repository.dart';
@@ -45,7 +49,7 @@ void runDashboardTests()
 
 Future<void> _pumpApp(WidgetTester tester) async
 {
-  final repository = MetroRepository();
+  final repository = MetroRepository(httpSource: HttpMetroDataSource(client: HttpClient()), sqfliteSource: SqfliteMetroDataSource(), connectivityService: ConnectivityService());
   await tester.pumpWidget(
     MultiProvider(
       providers: [

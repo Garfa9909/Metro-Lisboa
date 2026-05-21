@@ -8,15 +8,16 @@ import '../models/station.dart';
 
 class HttpMetroDataSource extends MetroDataSource
 {
-  final HttpClient _client;
+  final HttpClient? _client;
+  final key = "a5855068-66f3-3d26-8b3e-7c692a9e195c";
 
-  HttpMetroDataSource({required HttpClient client}) : _client = client;
+  HttpMetroDataSource({HttpClient? client}) : _client = client;
 
   @override
   Future<List<Station>> getAllStations() async
   {
-    final response = await _client.get(url: 'https://api.metrolisboa.pt:8243/estadoServicoML/1.0.1/infoEstacao/todos',
-    headers: {'Authorization': 'Bearer e8a60f7f-8667-3525-97fe-b9435b82534b'});
+    final response = await _client!.get(url: 'https://api.metrolisboa.pt:8243/estadoServicoML/1.0.1/infoEstacao/todos',
+    headers: {'Authorization': 'Bearer $key'});
 
     if(response.statusCode == 200)
     {
@@ -47,21 +48,49 @@ class HttpMetroDataSource extends MetroDataSource
   }
 
   @override
-  Future<void> attachIncident(String id, IncidentReport report) {
-    // TODO: implement attachIncident
+  Future<void> attachIncident(String id, IncidentReport report)
+  {
     throw UnimplementedError();
   }
 
   @override
-  Future<Station> getStationDetail(String id) {
-    // TODO: implement getStationDetail
-    throw UnimplementedError();
+  Future<Station> getStationDetail(String id) async
+  {
+    final stationId = id.split('_')[0];
+    final line = id.split('_')[1];  //The id we receive has the station ID and the line, separated by a _
+
+    final response = await _client!.get(url: 'https://api.metrolisboa.pt:8243/estadoServicoML/1.0.1/infoEstacao/$stationId',
+        headers: {'Authorization': 'Bearer $key'});
+
+    if(response.statusCode == 200)
+    {
+      final responseJSON = jsonDecode(response.body);
+      List stationsJSON = responseJSON['resposta'];
+
+      Station station = Station.fromMap(stationsJSON[0], line);
+      return station;
+    }
+
+    else
+    {
+      throw Exception("Status code: ${response.statusCode}");
+    }
   }
 
   @override
-  Future<List<Station>> getStationsByName(String name) {
-    // TODO: implement getStationsByName
-    throw UnimplementedError();
+  Future<List<Station>> getStationsByName(String name) async
+  {
+    List<Station> allStations = await getAllStations();
+    List<Station> stations = List.empty(growable: true);
+    for(Station station in allStations)
+    {
+      if(station.name == name)
+      {
+        stations.add(station);
+      }
+    }
+
+    return stations;
   }
 
   @override
