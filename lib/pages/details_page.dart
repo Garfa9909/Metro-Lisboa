@@ -1,6 +1,7 @@
 import 'package:cmproject/data/metro_repository.dart';
 import 'package:cmproject/models/incident_report.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,37 @@ class DetailsPage extends StatefulWidget
 
 class _MainPageState extends State<DetailsPage>
 {
+  Position? _userLocation;
+  //Ask for location permission when loading
+  @override
+  void initState()
+  {
+    super.initState();
+    requestLocationPermission();
+
+    getUserLocation();
+  }
+
+  Future<void> getUserLocation() async
+  {
+    final location = await Geolocator.getCurrentPosition();
+    setState(()
+    {
+
+      _userLocation = location;
+
+    });
+  }
+
+  Future<void> requestLocationPermission() async
+  {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if(permission == LocationPermission.denied)
+    {
+      await Geolocator.requestPermission();
+    }
+  }
+
   @override
   Widget build(BuildContext context)
   {
@@ -82,23 +114,12 @@ class _MainPageState extends State<DetailsPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Linha ${line.name}", style: TextStyle(color: Colors.black, fontSize: 20)),
-                    Text("Latitude: ${station.latitude}", style: TextStyle(color: Colors.black, fontSize: 20), ),
-                    Text("Longitude: ${station.longitude}", style: TextStyle(color: Colors.black, fontSize: 20)),
+                    buildDistanceText(station.latitude, station.longitude),
 
                     SizedBox(height: 20,),
 
                     Text("Incidents:", style: TextStyle(color: Colors.black, fontSize: 30)),
-
-                    SingleChildScrollView(
-                      child: SizedBox(
-                        height: MediaQuery.sizeOf(context).height*0.55,
-                        child: ListView(
-                          shrinkWrap: true,
-                          key:ValueKey("detail-screen-incidents-list"),
-                          children: station.reports.map( (incident) => buildIncidentEntry(incident) ).toList(),
-                        ),
-                      ),
-                    )
+                    buildIncidentList(station),
                   ],
                 ),
               ),
@@ -107,6 +128,28 @@ class _MainPageState extends State<DetailsPage>
         }
       },
     );
+  }
+
+  Widget buildIncidentList(Station station)
+  {
+    if(station.reports.isEmpty)
+    {
+      return Text("No incident reports", style: TextStyle(color: Colors.black, fontSize: 20));
+    }
+
+    else
+    {
+      return SingleChildScrollView(
+        child: SizedBox(
+          height: MediaQuery.sizeOf(context).height*0.55,
+          child: ListView(
+            shrinkWrap: true,
+            key:ValueKey("detail-screen-incidents-list"),
+            children: station.reports.map( (incident) => buildIncidentEntry(incident) ).toList(),
+          ),
+        ),
+      );
+    }
   }
 
   Widget buildIncidentEntry(IncidentReport incident)
@@ -162,5 +205,29 @@ class _MainPageState extends State<DetailsPage>
       {
         return notes;
       }
+  }
+
+  Widget buildDistanceText(double lat, double long)
+  {
+    if(_userLocation==null)
+    {
+      return Text("Trying to get user location...", style: TextStyle(color: Colors.black, fontSize: 20));
+    }
+
+    else
+    {
+      String unit = "m";
+
+      var dist = Geolocator.distanceBetween(_userLocation!.latitude, _userLocation!.longitude, lat, long);
+      String d = dist.toStringAsFixed(0);
+        if(dist >= 1000)
+        {
+            dist/=1000;
+            d = dist.toStringAsFixed(2);
+            unit = "km";
+        }
+
+        return Text("Distance to station: $d$unit", style: TextStyle(color: Colors.black, fontSize: 20));
+    }
   }
 }
