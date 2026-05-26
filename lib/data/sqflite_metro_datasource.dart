@@ -75,7 +75,9 @@ class SqfliteMetroDataSource extends MetroDataSource
     List result = await _database!.rawQuery("SELECT * FROM station WHERE id = ?", [id]);
     if(result.isNotEmpty)
     {
-      return Station.fromDB(result.first);
+      Station st = Station.fromDB(result.first);
+      st.setReports(await getStationIncidents(st.id));
+      return st;
     }
     else
     {
@@ -104,19 +106,23 @@ class SqfliteMetroDataSource extends MetroDataSource
       throw Exception("Database not initialized");
     }
 
-    await _database!.insert('station', station.toDB());
+    final response = await _database!.rawQuery("SELECT * FROM station WHERE id = ?", [station.id]);
+
+    //Insert only if it doesn't exist
+    if(response.isNotEmpty)
+    {
+        await _database!.insert('station', station.toDB());
+    }
+
   }
 
   //Deletes stations and saves new ones
   Future<void> saveStations(List<Station> stations) async
   {
-    await deleteStations();
-
     for(Station station in stations)
     {
       await insertStation(station);
     }
-
   }
 
   Future<List<IncidentReport>> getStationIncidents(String id) async
@@ -127,15 +133,6 @@ class SqfliteMetroDataSource extends MetroDataSource
     }
     List result = await _database!.rawQuery("SELECT * FROM incident WHERE stationId = ?", [id]);
     return result.map((entry) => IncidentReport.fromDB(entry)).toList();
-  }
-
-  Future<void> deleteStations() async
-  {
-    if(_database == null)
-    {
-      throw Exception("Database not initialized");
-    }
-    await _database!.rawQuery("DELETE FROM station");
   }
 
 }

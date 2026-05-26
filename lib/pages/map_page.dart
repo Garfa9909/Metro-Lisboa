@@ -5,6 +5,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../connectivity_module.dart';
+import '../data/http_metro_datasource.dart';
+import '../data/sqflite_metro_datasource.dart';
 import '/pages/pages.dart';
 import 'details_page.dart';
 
@@ -39,8 +42,7 @@ class _MapPageState extends State<MapPage>
   @override
   Widget build(BuildContext context)
   {
-    MetroRepository repository =
-    context.read<MetroRepository>();
+    MetroRepository repository = MetroRepository(httpSource: context.read<HttpMetroDataSource>(), sqfliteSource: context.read<SqfliteMetroDataSource>(), connectivityModule: context.read<ConnectivityModule>());
 
     return Scaffold(
       key: ValueKey("map-screen"),

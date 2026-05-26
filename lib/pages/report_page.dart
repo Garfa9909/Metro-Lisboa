@@ -1,6 +1,9 @@
 import 'package:cmproject/data/metro_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../connectivity_module.dart';
+import '../data/http_metro_datasource.dart';
+import '../data/sqflite_metro_datasource.dart';
 import '../models/incident_report.dart';
 import '../models/station.dart';
 import '/pages/pages.dart';
@@ -28,7 +31,7 @@ class _ReportPageState extends State<ReportPage>
   @override
   Widget build(BuildContext context)
   {
-    MetroRepository repository = context.read<MetroRepository>();
+    MetroRepository repository = MetroRepository(httpSource: context.read<HttpMetroDataSource>(), sqfliteSource: context.read<SqfliteMetroDataSource>(), connectivityModule: context.read<ConnectivityModule>());
 
     return Scaffold(
       key: ValueKey("incidents-report-screen"),

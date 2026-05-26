@@ -9,15 +9,47 @@ import '../models/station.dart';
 class HttpMetroDataSource extends MetroDataSource
 {
   final HttpClient? _client;
-  final key = "a5855068-66f3-3d26-8b3e-7c692a9e195c";
+  String token = "";
+  final consumerKey="VkZMEg7gKHeiF9X62AZ8Qp_oWnMa";
+  final consumerSecret="3fWpJ0Iffh8z0b89Th3M97mvQU4a";
+
+
 
   HttpMetroDataSource({HttpClient? client}) : _client = client;
+
+  Future<String> getAccessToken() async
+  {
+    final encoded = base64Encode(utf8.encode("$consumerKey:$consumerSecret"));
+    final response = await _client!.post(url: "https://api.metrolisboa.pt:8243/token",
+        headers: {"Authorization": "Basic $encoded"},
+        body: {"grant_type":"client_credentials",});
+    if(response.statusCode == 405)
+      {
+        return "error";
+      }
+    final responseJSON = jsonDecode(response.body);
+    return responseJSON["access_token"];
+  }
+
+  //Checks if access token is valid and if not, generates new one
+  Future<void> checkToken() async
+  {
+    final response = await _client!.get(url: 'https://api.metrolisboa.pt:8243/estadoServicoML/1.0.1/infoEstacao/todos',
+        headers: {'Authorization': 'Bearer $token'});
+
+    //If token is null or expired, create new one
+    if(response.statusCode == 401 || response.statusCode == 403)
+    {
+      token = await getAccessToken();
+    }
+  }
 
   @override
   Future<List<Station>> getAllStations() async
   {
+    await checkToken();
     final response = await _client!.get(url: 'https://api.metrolisboa.pt:8243/estadoServicoML/1.0.1/infoEstacao/todos',
-    headers: {'Authorization': 'Bearer $key'});
+    headers: {'Authorization': 'Bearer $token'});
 
     if(response.statusCode == 200)
     {
@@ -59,8 +91,9 @@ class HttpMetroDataSource extends MetroDataSource
     final stationId = id.split('_')[0];
     final line = id.split('_')[1];  //The id we receive has the station ID and the line, separated by a _
 
+    await checkToken();
     final response = await _client!.get(url: 'https://api.metrolisboa.pt:8243/estadoServicoML/1.0.1/infoEstacao/$stationId',
-        headers: {'Authorization': 'Bearer $key'});
+        headers: {'Authorization': 'Bearer $token'});
 
     if(response.statusCode == 200)
     {
@@ -94,8 +127,8 @@ class HttpMetroDataSource extends MetroDataSource
   }
 
   @override
-  Future<void> insertStation(Station station) {
-    // TODO: implement insertStation
-    throw UnimplementedError();
+  Future<void> insertStation(Station station)
+  {
+    throw Exception("Unavailable");
   }
 }

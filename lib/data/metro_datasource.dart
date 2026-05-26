@@ -1,7 +1,8 @@
 import 'package:cmproject/models/incident_report.dart';
 import 'package:cmproject/models/station.dart';
 
-abstract class MetroDataSource {
+abstract class MetroDataSource
+{
 
   Future<void> insertStation(Station station);
 

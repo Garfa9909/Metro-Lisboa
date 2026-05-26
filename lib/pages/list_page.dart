@@ -2,6 +2,9 @@ import 'package:cmproject/data/metro_repository.dart';
 import 'package:cmproject/pages/details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../connectivity_module.dart';
+import '../data/http_metro_datasource.dart';
+import '../data/sqflite_metro_datasource.dart';
 import 'line.dart';
 import '../models/station.dart';
 import '/pages/pages.dart';
@@ -13,7 +16,8 @@ class ListPage extends StatefulWidget {
   State<ListPage> createState() => _ListPageState();
 }
 
-class _ListPageState extends State<ListPage> {
+class _ListPageState extends State<ListPage>
+{
 
   String _search = "";
 
@@ -23,7 +27,7 @@ class _ListPageState extends State<ListPage> {
   void initState() {
     super.initState();
 
-    final repository = context.read<MetroRepository>();
+    MetroRepository repository = MetroRepository(httpSource: context.read<HttpMetroDataSource>(), sqfliteSource: context.read<SqfliteMetroDataSource>(), connectivityModule: context.read<ConnectivityModule>());
     stationsFuture = repository.getAllStations();
   }
 
@@ -54,6 +58,14 @@ class _ListPageState extends State<ListPage> {
 
           final stations = snapshot.data ?? [];
 
+          if(stations.isEmpty)
+            {
+              return Center(
+                child: Text("Não foi possível obter as estações de metro. Verifique a conectividade e volte a tentar"),
+              );
+
+            }
+
           return buildList(stations);
         },
       ),
@@ -63,10 +75,7 @@ class _ListPageState extends State<ListPage> {
   Widget buildList(List<Station> stations) {
 
     final searchResults = stations.where((station) {
-      return station.name
-          .toLowerCase()
-          .contains(_search.toLowerCase());
-    }).toList();
+      return station.name.toLowerCase().contains(_search.toLowerCase());}).toList();
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -94,13 +103,13 @@ class _ListPageState extends State<ListPage> {
     );
   }
 
-  Widget stationEntry(Station station) {
-    return ListTile(
-      title: stationButton(station),
-    );
+  Widget stationEntry(Station station)
+  {
+    return ListTile(title: stationButton(station),);
   }
 
-  Widget stationButton(Station station) {
+  Widget stationButton(Station station)
+  {
     return TextButton(
       onPressed: () {
         Navigator.push(
@@ -128,7 +137,8 @@ class _ListPageState extends State<ListPage> {
     );
   }
 
-  Widget lineDisplay(Line? line) {
+  Widget lineDisplay(Line? line)
+  {
     return Column(
       children: [
         Container(

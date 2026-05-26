@@ -1,4 +1,7 @@
+import 'package:cmproject/connectivity_module.dart';
+import 'package:cmproject/data/http_metro_datasource.dart';
 import 'package:cmproject/data/metro_repository.dart';
+import 'package:cmproject/data/sqflite_metro_datasource.dart';
 import 'package:cmproject/models/incident_report.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -54,7 +57,7 @@ class _MainPageState extends State<DetailsPage>
   @override
   Widget build(BuildContext context)
   {
-    MetroRepository repository = context.read<MetroRepository>();
+    MetroRepository repository = MetroRepository(httpSource: context.read<HttpMetroDataSource>(), sqfliteSource: context.read<SqfliteMetroDataSource>(), connectivityModule: context.read<ConnectivityModule>());
 
     return FutureBuilder<Station>(
       future: repository.getStationDetail(widget.stationId),

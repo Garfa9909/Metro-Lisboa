@@ -1,8 +1,8 @@
 import 'package:cmproject/data/sqflite_metro_datasource.dart';
 import 'package:cmproject/models/incident_report.dart';
 import 'package:cmproject/models/station.dart';
-import 'package:cmproject/services/connectivity_service.dart';
 
+import '../connectivity_module.dart';
 import 'http_metro_datasource.dart';
 
 class MetroRepository
@@ -10,13 +10,13 @@ class MetroRepository
 
   final HttpMetroDataSource httpSource;
   final SqfliteMetroDataSource sqfliteSource;
-  final ConnectivityService connectivityService;
+  final ConnectivityModule connectivityModule;
 
-  MetroRepository({required this.httpSource, required this.sqfliteSource, required this.connectivityService});
+  MetroRepository({required this.httpSource, required this.sqfliteSource, required this.connectivityModule});
 
   Future<List<Station>> getAllStations() async
   {
-    if(await connectivityService.isOnline())
+    if(await connectivityModule.checkConnectivity())
     {
       final stations = await httpSource.getAllStations();
       await sqfliteSource.saveStations(stations);
@@ -27,10 +27,6 @@ class MetroRepository
     else  //offline
     {
       List<Station> stations = await sqfliteSource.getAllStations();
-      if(stations.isEmpty)
-      {
-        throw Exception("Check your connectivity and try again later.");
-      }
 
       return stations;
     }
@@ -39,17 +35,9 @@ class MetroRepository
   Future<Station> getStationDetail(String id) async
   {
     Station station;
-    if(await connectivityService.isOnline())
-    {
-      station = await httpSource.getStationDetail(id);
-    }
-    else  //Offline
-    {
-      station = await sqfliteSource.getStationDetail(id);
-    }
 
-    List<IncidentReport> incidents = await sqfliteSource.getStationIncidents(station.id);
-    station.setReports(incidents);
+    station = await sqfliteSource.getStationDetail(id);
+
     return station;
   }
 
