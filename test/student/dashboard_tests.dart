@@ -9,7 +9,6 @@ import 'package:cmproject/location_module.dart';
 import 'package:cmproject/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:cmproject/data/metro_repository.dart';
 import 'package:provider/provider.dart';
 
 import 'test_lib.dart';

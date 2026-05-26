@@ -37,8 +37,8 @@ class _MainPageState extends State<DetailsPage>
     locationFuture = locationModule.onLocationChanged().firstWhere(
           (event) => event.latitude != null && event.longitude != null,
       orElse: () => LocationData.fromMap({
-        "latitude": 0,
-        "longitude": 0,
+        "latitude": 0.0,
+        "longitude": 0.0,
       }),
     );
   }

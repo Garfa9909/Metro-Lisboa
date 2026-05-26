@@ -67,7 +67,6 @@ class SqfliteMetroDataSource extends MetroDataSource
   @override
   Future<Station> getStationDetail(String id) async
   {
-    Station station;
     if(_database == null)
     {
       throw Exception("Database not initialized");
