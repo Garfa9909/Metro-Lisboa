@@ -1,8 +1,9 @@
 import 'package:cmproject/data/metro_repository.dart';
+import 'package:cmproject/location_module.dart';
 import 'package:cmproject/models/station.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
 import '../connectivity_module.dart';
@@ -22,27 +23,23 @@ class MapPage extends StatefulWidget
 
 class _MapPageState extends State<MapPage>
 {
-  //Ask for location permission when loading
+  late Future<List<Station>> stationsFuture;
+  late Future<LocationData> locationFuture;
+
   @override
   void initState()
   {
     super.initState();
-    requestLocationPermission();
-  }
-
-  Future<void> requestLocationPermission() async
-  {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if(permission == LocationPermission.denied)
-    {
-      await Geolocator.requestPermission();
-    }
+    MetroRepository repository = MetroRepository(httpSource: context.read<HttpMetroDataSource>(), sqfliteSource: context.read<SqfliteMetroDataSource>(), connectivityModule: context.read<ConnectivityModule>(),);
+    LocationModule locationModule = context.read<LocationModule>();
+    locationFuture = locationModule.onLocationChanged().first;
+    stationsFuture = repository.getAllStations();
   }
 
   @override
   Widget build(BuildContext context)
   {
-    MetroRepository repository = MetroRepository(httpSource: context.read<HttpMetroDataSource>(), sqfliteSource: context.read<SqfliteMetroDataSource>(), connectivityModule: context.read<ConnectivityModule>());
+
 
     return Scaffold(
       key: ValueKey("map-screen"),
@@ -55,62 +52,61 @@ class _MapPageState extends State<MapPage>
         toolbarHeight: 70,
       ),
 
-      body: FutureBuilder<List<Station>>(
-        future: repository.getAllStations(),
-
-        builder: (_, snapshot)
-        {
-          if(snapshot.connectionState != ConnectionState.done)
-          {
-            return Center(child: CircularProgressIndicator(),);
+      body: FutureBuilder<LocationData>(
+        future: locationFuture,
+        builder: (_, locationSnapshot) {
+          if (locationSnapshot.connectionState != ConnectionState.done) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           }
 
-          else
+          bool permissions = locationSnapshot.hasData && locationSnapshot.data != null && locationSnapshot.data!.latitude != null && locationSnapshot.data!.longitude != null;
           {
-            if(snapshot.hasError)
-            {
-              return Center(child: Text(snapshot.error.toString(),),);
-            }
+              return FutureBuilder<List<Station>>(
+                future: stationsFuture,
+                builder: (_, snapshot) {
+                  if (snapshot.connectionState != ConnectionState.done) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
 
-            else
-            {
-              List<Station> stations = snapshot.data!;
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(snapshot.error.toString()),
+                    );
+                  }
 
-              Set<Marker> markers = stations.map((station)
-                {
-                  return Marker(
+                  final stations = snapshot.data!;
 
-                    markerId: MarkerId(station.id),
-                    position: LatLng(station.latitude, station.longitude,),
+                  final markers = stations.map((station) {
+                    return Marker(
+                      markerId: MarkerId(station.id),
+                      position: LatLng(station.latitude, station.longitude,),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                DetailsPage(stationId: station.id),
+                          ),
+                        );
+                      },
+                    );
+                  }).toSet();
 
-                    onTap: ()
-                    {
-                      Navigator.push(context, MaterialPageRoute(
-                          builder: (context) =>
-                              DetailsPage(stationId: station.id,),
-                        ),
-                      );
-                    },
+                  return GoogleMap(
+                    initialCameraPosition: CameraPosition(target: LatLng(stations[0].latitude, stations[0].longitude), zoom: 13,),
+                    myLocationEnabled: permissions,
+                    myLocationButtonEnabled: permissions,
+                    markers: markers,
                   );
                 },
-              ).toSet();
-
-              return GoogleMap(
-
-                initialCameraPosition:
-                CameraPosition(
-                  target: LatLng(stations[0].latitude, stations[0].longitude,),
-                  zoom:13
-                ),
-                myLocationEnabled: true,
-                myLocationButtonEnabled: true,
-
-                markers: markers,
               );
             }
-          }
         },
-      ),
+      )
     );
   }
 }

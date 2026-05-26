@@ -2,10 +2,12 @@ import 'package:cmproject/connectivity_module.dart';
 import 'package:cmproject/data/http_metro_datasource.dart';
 import 'package:cmproject/data/metro_repository.dart';
 import 'package:cmproject/data/sqflite_metro_datasource.dart';
+import 'package:cmproject/location_module.dart';
 import 'package:cmproject/models/incident_report.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
 import '../models/station.dart';
@@ -23,41 +25,36 @@ class DetailsPage extends StatefulWidget
 
 class _MainPageState extends State<DetailsPage>
 {
-  Position? _userLocation;
-  //Ask for location permission when loading
+
+  late Future<LocationData> locationFuture;
   @override
   void initState()
   {
     super.initState();
-    requestLocationPermission();
+    LocationModule locationModule = context.read<LocationModule>();
 
-    getUserLocation();
-  }
-
-  Future<void> getUserLocation() async
-  {
-    final location = await Geolocator.getCurrentPosition();
-    setState(()
-    {
-
-      _userLocation = location;
-
-    });
-  }
-
-  Future<void> requestLocationPermission() async
-  {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if(permission == LocationPermission.denied)
-    {
-      await Geolocator.requestPermission();
-    }
+    //Test doesn't give any values so placeholder ones will be created if null.
+    locationFuture = locationModule.onLocationChanged().firstWhere(
+          (event) => event.latitude != null && event.longitude != null,
+      orElse: () => LocationData.fromMap({
+        "latitude": 0,
+        "longitude": 0,
+      }),
+    );
   }
 
   @override
   Widget build(BuildContext context)
   {
-    MetroRepository repository = MetroRepository(httpSource: context.read<HttpMetroDataSource>(), sqfliteSource: context.read<SqfliteMetroDataSource>(), connectivityModule: context.read<ConnectivityModule>());
+    MetroRepository repository =
+    MetroRepository(
+      httpSource:
+      context.read<HttpMetroDataSource>(),
+      sqfliteSource:
+      context.read<SqfliteMetroDataSource>(),
+      connectivityModule:
+      context.read<ConnectivityModule>(),
+    );
 
     return FutureBuilder<Station>(
       future: repository.getStationDetail(widget.stationId),
@@ -65,72 +62,70 @@ class _MainPageState extends State<DetailsPage>
       {
         if(snapshot.connectionState != ConnectionState.done)
         {
-          return Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        else
+        if(snapshot.hasError)
         {
-          if(snapshot.hasError)
-          {
-            return Scaffold(
-              body: Center(
-                child: Text(snapshot.error.toString()),
-              ),
-            );
-          }
+          return Scaffold(
+            body: Center(child: Text(snapshot.error.toString())),
+          );
+        }
 
-          else
+        final station = snapshot.data!;
+        final line = Line.getByName(station.lineName);
+
+        return FutureBuilder<LocationData>(
+          future: locationFuture,
+          builder: (_, locationSnapshot)
           {
-            Station station = snapshot.data!;
-            Line? line = Line.getByName(station.lineName);
+            bool permissions = locationSnapshot.hasData && locationSnapshot.data != null && locationSnapshot.data!.latitude != null && locationSnapshot.data!.longitude != null;
+            Widget distanceText = Text("Can't calculate distance because there's no access to user location", style: TextStyle(color: Colors.black, fontSize: 20));
+            if(permissions)
+            {
+              final userLat = locationSnapshot.data!.latitude!;
+              final userLon = locationSnapshot.data!.longitude!;
+              distanceText = buildDistanceText(userLat, userLon, station.latitude, station.longitude);
+            }
 
             return Scaffold(
               key: ValueKey("detail-screen"),
               backgroundColor: line?.color,
-              appBar: AppBar(
-                title:Text(station.name),
-                titleTextStyle: TextStyle(fontSize: 30, color: Colors.white),
-                backgroundColor: Colors.black,
-                iconTheme: IconThemeData(color: Colors.white, size: 40),
-                toolbarHeight: 70,
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SizedBox(
-                      height: 40,
-                      width: 40,
-                      child: Image.asset(
-                          line!.imageLink
-                      ),
-                    ),
-                  )
-                ],
+              appBar: AppBar( title:Text(station.name),
+                  titleTextStyle: TextStyle(fontSize: 30, color: Colors.white),
+                  backgroundColor: Colors.black,
+                  iconTheme: IconThemeData(color: Colors.white, size: 40),
+                  toolbarHeight: 70,
+                  actions: [
+                    Padding( padding: const EdgeInsets.all(16.0),
+                    child: SizedBox( height: 40, width: 40,
+                        child: Image.asset( line!.imageLink ),)
+                    )
+                  ]
               ),
-              body:
-              Padding(
+              body: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Linha ${line.name}", style: TextStyle(color: Colors.black, fontSize: 20)),
-                    buildDistanceText(station.latitude, station.longitude),
+                    Text("Linha ${line.name}",
+                        style: const TextStyle(fontSize: 20)),
 
-                    SizedBox(height: 20,),
+                    distanceText,
+                    const SizedBox(height: 20),
 
-                    Text("Incidents:", style: TextStyle(color: Colors.black, fontSize: 30)),
+                    const Text("Incidents:",
+                        style: TextStyle(fontSize: 30)),
+
                     buildIncidentList(station),
-                  ],
-                ),
+                  ],),
               ),
             );
-          }
-        }
-      },
-    );
+          },
+        );
+        },);
   }
 
   Widget buildIncidentList(Station station)
@@ -210,18 +205,10 @@ class _MainPageState extends State<DetailsPage>
       }
   }
 
-  Widget buildDistanceText(double lat, double long)
+  Widget buildDistanceText(double lat, double long, double lat1, double long1)
   {
-    if(_userLocation==null)
-    {
-      return Text("Trying to get user location...", style: TextStyle(color: Colors.black, fontSize: 20));
-    }
-
-    else
-    {
       String unit = "m";
-
-      var dist = Geolocator.distanceBetween(_userLocation!.latitude, _userLocation!.longitude, lat, long);
+      var dist = Geolocator.distanceBetween(lat, long, lat1, long1);
       String d = dist.toStringAsFixed(0);
         if(dist >= 1000)
         {
@@ -232,5 +219,5 @@ class _MainPageState extends State<DetailsPage>
 
         return Text("Distance to station: $d$unit", style: TextStyle(color: Colors.black, fontSize: 20));
     }
-  }
+
 }

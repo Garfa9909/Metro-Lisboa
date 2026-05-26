@@ -109,7 +109,7 @@ class SqfliteMetroDataSource extends MetroDataSource
     final response = await _database!.rawQuery("SELECT * FROM station WHERE id = ?", [station.id]);
 
     //Insert only if it doesn't exist
-    if(response.isNotEmpty)
+    if(response.isEmpty)
     {
         await _database!.insert('station', station.toDB());
     }
