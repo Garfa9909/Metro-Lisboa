@@ -93,7 +93,7 @@ Dashboard and incident report screen remain the same as in first submission.
 
 # Architecture
 
-The app relies on the Metro Lisboa API for obtaining the information of the stations. After calling it once, all of the stations will be saved into the database, allowing the user to access them if online too.
+The app relies on the Metro Lisboa API for obtaining the information of the stations. After calling it once, all of the stations will be saved into the database, allowing the user to access them if offline too.
 Upon entering list, map or details screen, the page will ask the metro repository for the stations. If the user is online, the metro repository will use the HTTP datasource, to obtain the latest information. If the user is offline, the metro repository will use the sqflite datasource, obtaining the information saved in the database.
 Additionally, the incident reports will be obtained from the database in every case.
 
