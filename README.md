@@ -1,51 +1,30 @@
-# Team
+# Metro Lisboa App
 
-Rafael Ceres Martínez - a22510504
+A Flutter mobile application for checking Lisbon Metro stations, waiting times, and real-time geolocation on an interactive map, built with offline-first support.
 
-# Part 1
+## Features
 
-# Screenshots
-## Dashboard
+- **Station Directory & Details:** Browse all Lisbon Metro stations, view detailed station information, and check real-time waiting times.
+- **Interactive Map:** Locate stations across Lisbon and track your current position in real time.
+- **Offline Support:** Automatically caches station data locally so you can access station lists, details, and maps without an internet connection.
+- **Incident Reports:** View and access service incident reports directly from local storage.
 
-![Dashboard](assets/screenshots/dashboard.png)
+## Architecture & Data Flow
 
-## List
+The application follows a **Repository Pattern** to abstract data sources and seamlessly switch between online and offline modes:
 
-![List](assets/screenshots/stations.png)
+- **Initial Synchronization:** The app fetches station data from the **Metro Lisboa API**. Once retrieved, all stations are persisted into the local SQLite database (`sqflite`), enabling full offline access afterward.
+- **Dynamic Data Retrieval:** When navigating to the **List**, **Map**, or **Details** screen, the UI requests station data from the `MetroRepository`:
+  - **Online Mode:** The repository queries the **HTTP Datasource** to fetch the latest real-time information from the API.
+  - **Offline Mode:** The repository falls back to the **sqflite Datasource** to load cached station data from the local database.
+- **Incident Reports:** Incident reports are retrieved directly from the local `sqflite` database in all scenarios (both online and offline).
 
-## Details
+## Tech Stack
 
-![Details](assets/screenshots/details.png)
-
-## Map
-
-![Map](assets/screenshots/map.png)
-
-## Report Incident
-
-![Report Incident](assets/screenshots/report.png)
-
-# Functionalities implemented
-
-- Passed teacher tests
-
-- Dashboard includes link to map and station pages
-
-- Added tests to verify that the links in the dashboard page forward to their corresponding pages, and passed them successfully
-
-- Stations are displayed in list and can be searched using the search bar
-
-- Map screen contains an image
-
-- Station details screen shows all of the information, as well as the incidents
-
-- Incident report form works as intended
-
-# Auto evaluation
-
-While I think I implemented all of the functionalities successfully, I could have been more creative on the dashboard. That's why I expect a grade around 14.
-
-# Part 2
+- **Framework:** Flutter & Dart
+- **Local Persistence:** `sqflite` (SQLite)
+- **Networking:** HTTP client consuming the Metro Lisboa API
+- **Maps & Location:** Interactive map view with real-time device geolocation
 
 # Screenshots
 
@@ -61,50 +40,9 @@ While I think I implemented all of the functionalities successfully, I could hav
 
 <img width="472" height="788" alt="image" src="https://github.com/user-attachments/assets/dfcaa18b-0391-4392-980b-155833033e8b" />
 
-Dashboard and incident report screen remain the same as in first submission.
+## Report Incident
 
-# Functionalities implemented:
-
-- Passed teacher mandatory tests
-
-- Passed teacher optional tests
-
-- Student tests for dashboard (same as in first submission)
-
-- Dashboard with title screen and links to list and map screen.
-
-- Station list using API
-
-- Station map using gogle maps
-
-- Station detail:
-  - Distance to station
-  - Incident list from database
-
-- Incidents registered in database
-
-- Search bar in station list
-
-- Location for calculating distance to station and also in map.
-
-- Offline functionalities
-
-- Video
-
-# Architecture
-
-The app relies on the Metro Lisboa API for obtaining the information of the stations. After calling it once, all of the stations will be saved into the database, allowing the user to access them if offline too.
-Upon entering list, map or details screen, the page will ask the metro repository for the stations. If the user is online, the metro repository will use the HTTP datasource, to obtain the latest information. If the user is offline, the metro repository will use the sqflite datasource, obtaining the information saved in the database.
-Additionally, the incident reports will be obtained from the database in every case.
-
-# Auto evaluation
-
-I implemented almost all of the functionalities (except for the waiting times), but the dashboard is not very ellaborate and the design is very simple, so I think I'd give me a grade around 14.
-
-# Video link
-
-https://youtu.be/lhZKYUbIGUY
-
+![Report Incident](assets/screenshots/report.png)
 
 
 
